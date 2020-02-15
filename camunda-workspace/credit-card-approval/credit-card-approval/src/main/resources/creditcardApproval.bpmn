@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0kur87m" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.5.0">
+  <bpmn:process id="CreditCardApprovalProcessProcess" name="Credit Card Approval Process" isExecutable="true">
+    <bpmn:startEvent id="CreditCardIsNeededStartEvent" name="Credit Card is needed">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="apply" label="Would you like to Apply for SurgeCoin Card?" type="boolean" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>SequenceFlow_0v32tjf</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0v32tjf" sourceRef="CreditCardIsNeededStartEvent" targetRef="ApplyForCreditCardTask" />
+    <bpmn:userTask id="ApplyForCreditCardTask" name="Apply for Credit Card" camunda:assignee="Joey" camunda:candidateGroups="customer">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="firstname" label="First Name" type="string" />
+          <camunda:formField id="lastname" label="Last Name" type="string" />
+          <camunda:formField id="age" label="Age (0 - 99)" type="long" />
+          <camunda:formField id="score" label="Credit Score (0-10)" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0v32tjf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1oavvqq</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1oavvqq" sourceRef="ApplyForCreditCardTask" targetRef="DecideOnCreditApprovalTask" />
+    <bpmn:businessRuleTask id="DecideOnCreditApprovalTask" name="Decide on Credit Approval" camunda:resultVariable="approved" camunda:decisionRef="creditcardApproval" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>SequenceFlow_1oavvqq</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0qtzos7</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0qa1h9r">
+      <bpmn:incoming>SequenceFlow_1hti8uu</bpmn:incoming>
+      <bpmn:outgoing>YesSequenceFlow</bpmn:outgoing>
+      <bpmn:outgoing>NoSequenceFlow</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="YesSequenceFlow" name="Yes" sourceRef="ExclusiveGateway_0qa1h9r" targetRef="Task_07cud5o">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{approved}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="NoSequenceFlow" name="No" sourceRef="ExclusiveGateway_0qa1h9r" targetRef="NotifyRejectTask">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{not approved}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="CreditCardRejectedEndEvent" name="Credit Card Rejected">
+      <bpmn:incoming>SequenceFlow_03fsfs9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_03fsfs9" sourceRef="NotifyRejectTask" targetRef="CreditCardRejectedEndEvent" />
+    <bpmn:endEvent id="CreditCardApprovedEndEvent" name="Credit Card Approved">
+      <bpmn:incoming>SequenceFlow_0yvs660</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0yvs660" sourceRef="NotifyApprovalTask" targetRef="CreditCardApprovedEndEvent" />
+    <bpmn:sequenceFlow id="SequenceFlow_0qtzos7" sourceRef="DecideOnCreditApprovalTask" targetRef="ReviewTask" />
+    <bpmn:sequenceFlow id="SequenceFlow_1hti8uu" sourceRef="ReviewTask" targetRef="ExclusiveGateway_0qa1h9r" />
+    <bpmn:userTask id="ReviewTask" name="Review Application" camunda:assignee="Nobin" camunda:candidateGroups="management">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="firstname" label="First Name" type="string" />
+          <camunda:formField id="lastname" label="Last Name" type="string" />
+          <camunda:formField id="age" label="Customer&#39;s Age" type="long" />
+          <camunda:formField id="score" label="Customer&#39;s Credit Score" type="long" />
+          <camunda:formField id="approved" label="Eligible for SurgeCoin Card" type="boolean" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0qtzos7</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1hti8uu</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="NotifyApprovalTask" name="Notify Approval" camunda:type="external" camunda:topic="NotiApproved">
+      <bpmn:incoming>SequenceFlow_1nb2caf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0yvs660</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="NotifyRejectTask" name="Notify Reject" camunda:type="external" camunda:topic="NotiRejected">
+      <bpmn:incoming>NoSequenceFlow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_03fsfs9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1nb2caf" sourceRef="Task_07cud5o" targetRef="NotifyApprovalTask" />
+    <bpmn:serviceTask id="Task_07cud5o" name="Saved in Database" camunda:class="com.camunda.surge.delegate.CardirtCardDelegate">
+      <bpmn:incoming>YesSequenceFlow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1nb2caf</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CreditCardApprovalProcessProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="CreditCardIsNeededStartEvent">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="163" y="142" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0v32tjf_di" bpmnElement="SequenceFlow_0v32tjf">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1invmvx_di" bpmnElement="ApplyForCreditCardTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1oavvqq_di" bpmnElement="SequenceFlow_1oavvqq">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BusinessRuleTask_1eq4ken_di" bpmnElement="DecideOnCreditApprovalTask">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0qa1h9r_di" bpmnElement="ExclusiveGateway_0qa1h9r" isMarkerVisible="true">
+        <dc:Bounds x="775" y="92" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0xxz0wv_di" bpmnElement="YesSequenceFlow">
+        <di:waypoint x="825" y="117" />
+        <di:waypoint x="910" y="117" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="853" y="99" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1e70tlr_di" bpmnElement="NoSequenceFlow">
+        <di:waypoint x="800" y="142" />
+        <di:waypoint x="800" y="230" />
+        <di:waypoint x="890" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="808" y="149" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1avdm9z_di" bpmnElement="CreditCardRejectedEndEvent">
+        <dc:Bounds x="1062" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1052" y="255" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_03fsfs9_di" bpmnElement="SequenceFlow_03fsfs9">
+        <di:waypoint x="990" y="230" />
+        <di:waypoint x="1062" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1c8anej_di" bpmnElement="CreditCardApprovedEndEvent">
+        <dc:Bounds x="1252" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1242" y="142" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0yvs660_di" bpmnElement="SequenceFlow_0yvs660">
+        <di:waypoint x="1180" y="117" />
+        <di:waypoint x="1252" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qtzos7_di" bpmnElement="SequenceFlow_0qtzos7">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="590" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1hti8uu_di" bpmnElement="SequenceFlow_1hti8uu">
+        <di:waypoint x="690" y="117" />
+        <di:waypoint x="775" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1xjzklx_di" bpmnElement="ReviewTask">
+        <dc:Bounds x="590" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_023t0qt_di" bpmnElement="NotifyApprovalTask">
+        <dc:Bounds x="1080" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0go82ft_di" bpmnElement="NotifyRejectTask">
+        <dc:Bounds x="890" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1nb2caf_di" bpmnElement="SequenceFlow_1nb2caf">
+        <di:waypoint x="1010" y="117" />
+        <di:waypoint x="1080" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0dm8p6u_di" bpmnElement="Task_07cud5o">
+        <dc:Bounds x="910" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

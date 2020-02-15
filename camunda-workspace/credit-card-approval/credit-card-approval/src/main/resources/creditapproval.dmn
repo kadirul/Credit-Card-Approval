@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="Definitions_0ki8ima" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.5.0">
+  <decision id="creditcardApproval" name="Decide on Credit Card Approval">
+    <extensionElements>
+      <biodi:bounds x="157" y="81" width="180" height="80" />
+      <biodi:edge source="decideOnCreditStatus">
+        <biodi:waypoints x="434" y="267" />
+        <biodi:waypoints x="337" y="155" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#decideOnCreditStatus" />
+    </informationRequirement>
+    <decisionTable id="decisionTable_1" hitPolicy="FIRST">
+      <input id="input_1" label="Age">
+        <inputExpression id="inputExpression_1" typeRef="integer">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_057dvq3" label="Credit Status">
+        <inputExpression id="LiteralExpression_1afoxfx" typeRef="string">
+          <text>status</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0961w7v">
+          <text>"Normal","AbNormal"</text>
+        </inputValues>
+      </input>
+      <output id="output_1" label="Approval" name="approved" typeRef="boolean" />
+      <rule id="DecisionRule_0hj4v5k">
+        <inputEntry id="UnaryTests_08iaziw">
+          <text>(0..18]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1fvzfuv">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_13b1isk">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0werp9c">
+        <inputEntry id="UnaryTests_1sbrnki">
+          <text>(18..45]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0brqthl">
+          <text>"Normal"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1nihbk0">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1pjpzo7">
+        <inputEntry id="UnaryTests_0qdvif2">
+          <text>(18..45]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0nw8jku">
+          <text>"AbNormal"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_09q742x">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0i0iivf">
+        <inputEntry id="UnaryTests_1hnx3ih">
+          <text>[45..99)</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_17c1oxl">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_141d207">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0noh0y9">
+        <inputEntry id="UnaryTests_1s67wcl">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1rvl8sw">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_012tz28">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="decideOnCreditStatus" name="Decide on Credit Status">
+    <extensionElements>
+      <biodi:bounds x="418" y="267" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_0kr1fft" hitPolicy="FIRST">
+      <input id="InputClause_0z7c5m4" label="Credit Score">
+        <inputExpression id="LiteralExpression_017ldgu" typeRef="integer">
+          <text>score</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_1gi3fu4" label="Credit Status" name="status" typeRef="string">
+        <outputValues id="UnaryTests_0eqmkbh">
+          <text>"Normal","AbNormal"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_181952z">
+        <inputEntry id="UnaryTests_11ykm43">
+          <text>[0..5]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0xhdqls">
+          <text>"Normal"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1wlcqrg">
+        <inputEntry id="UnaryTests_1d0gzh1">
+          <text>(5..10]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0yx1h4f">
+          <text>"AbNormal"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0iuvvah">
+        <inputEntry id="UnaryTests_1y42htj">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_151xtob">
+          <text>"AbNormal"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
