@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0z801lv" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.5.0">
+  <bpmn:process id="ReceiveFormProcess" name="Receive Form Process" isExecutable="true">
+    <bpmn:startEvent id="VendorAppliedStartEvent" name="Vendor Applied">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="vendorname" label="Company Name" type="string" />
+          <camunda:formField id="firstname" label="First Name" type="string" />
+          <camunda:formField id="lastname" label="Last Name" type="string" />
+          <camunda:formField id="phone" label="Phone" type="long" />
+          <camunda:formField id="email" label="Email" type="string" />
+          <camunda:formField id="address" label="Adress Street" type="string" />
+          <camunda:formField id="city" label="City" type="string" />
+          <camunda:formField id="state" label="State/Province/Region" type="enum">
+            <camunda:value id="TX" name="Texas" />
+          </camunda:formField>
+          <camunda:formField id="zip" label="Zip/ Postcal Code" type="long" />
+          <camunda:formField id="country" label="Country" type="string" />
+          <camunda:formField id="submit" label="Submit Application" type="boolean" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>SequenceFlow_0eyvjt5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0eyvjt5" sourceRef="VendorAppliedStartEvent" targetRef="ReceiveTheVendorFormTask" />
+    <bpmn:serviceTask id="ReceiveTheVendorFormTask" name="Receive the Vendor form" camunda:class="com.surge.delegate.ReceiveVendorInfoDelegate">
+      <bpmn:incoming>SequenceFlow_0eyvjt5</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0612huw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0612huw" sourceRef="ReceiveTheVendorFormTask" targetRef="Task_1nqol4s" />
+    <bpmn:serviceTask id="Task_1nqol4s" name="Verify Vendor Information" camunda:class="com.surge.delegate.VerifyVendorInfoDelegate">
+      <bpmn:incoming>SequenceFlow_0612huw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0p5ezmf</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_0spicsj" name="Store Vendor Iinfo" camunda:class="/retail-approval/src/main/java/com/surge/delegate/VendorDataDelegate.java">
+      <bpmn:incoming>SequenceFlow_18yzrcj</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_13nbc8k</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_0entz19" name="Retrieve Vendor info" camunda:class="com.surge.delegate.RetrieveVendorInfoDelegate">
+      <bpmn:incoming>SequenceFlow_1d2sddn</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ymuvke</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_1b6p5nc">
+      <bpmn:incoming>SequenceFlow_0ymuvke</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0ymuvke" sourceRef="Task_0entz19" targetRef="EndEvent_1b6p5nc" />
+    <bpmn:endEvent id="EndEvent_1op8mjc">
+      <bpmn:incoming>SequenceFlow_13nbc8k</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_13nbc8k" sourceRef="Task_0spicsj" targetRef="EndEvent_1op8mjc" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0v171lz" name="New Vendor">
+      <bpmn:incoming>SequenceFlow_0p5ezmf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1d2sddn</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_18yzrcj</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0p5ezmf" sourceRef="Task_1nqol4s" targetRef="ExclusiveGateway_0v171lz" />
+    <bpmn:sequenceFlow id="SequenceFlow_1d2sddn" name="No" sourceRef="ExclusiveGateway_0v171lz" targetRef="Task_0entz19">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not isNewVendor}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_18yzrcj" name="Yes" sourceRef="ExclusiveGateway_0v171lz" targetRef="Task_0spicsj">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isNewVendor}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ReceiveFormProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="VendorAppliedStartEvent">
+        <dc:Bounds x="172" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="155" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0eyvjt5_di" bpmnElement="SequenceFlow_0eyvjt5">
+        <di:waypoint x="208" y="130" />
+        <di:waypoint x="260" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0iujl6f_di" bpmnElement="ReceiveTheVendorFormTask">
+        <dc:Bounds x="260" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0612huw_di" bpmnElement="SequenceFlow_0612huw">
+        <di:waypoint x="360" y="130" />
+        <di:waypoint x="420" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1h2dpx8_di" bpmnElement="Task_1nqol4s">
+        <dc:Bounds x="420" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0ii2seb_di" bpmnElement="Task_0spicsj">
+        <dc:Bounds x="700" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1s1fkd6_di" bpmnElement="Task_0entz19">
+        <dc:Bounds x="700" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1b6p5nc_di" bpmnElement="EndEvent_1b6p5nc">
+        <dc:Bounds x="872" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ymuvke_di" bpmnElement="SequenceFlow_0ymuvke">
+        <di:waypoint x="800" y="130" />
+        <di:waypoint x="872" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1op8mjc_di" bpmnElement="EndEvent_1op8mjc">
+        <dc:Bounds x="872" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13nbc8k_di" bpmnElement="SequenceFlow_13nbc8k">
+        <di:waypoint x="800" y="240" />
+        <di:waypoint x="872" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0v171lz_di" bpmnElement="ExclusiveGateway_0v171lz" isMarkerVisible="true">
+        <dc:Bounds x="585" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="579" y="75" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0p5ezmf_di" bpmnElement="SequenceFlow_0p5ezmf">
+        <di:waypoint x="520" y="130" />
+        <di:waypoint x="585" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1d2sddn_di" bpmnElement="SequenceFlow_1d2sddn">
+        <di:waypoint x="635" y="130" />
+        <di:waypoint x="700" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="660" y="112" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_18yzrcj_di" bpmnElement="SequenceFlow_18yzrcj">
+        <di:waypoint x="610" y="155" />
+        <di:waypoint x="610" y="240" />
+        <di:waypoint x="700" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="616" y="195" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
